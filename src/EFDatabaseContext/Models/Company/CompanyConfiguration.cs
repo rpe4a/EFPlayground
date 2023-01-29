@@ -20,6 +20,9 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
         // Indexes
         builder.HasIndex(c => c.Name);
 
+        //QueryFilter
+        builder.HasQueryFilter(c => !EF.Property<bool>(c, "IsDelete"));
+        
         // Properties
         builder.Property(p => p.Id)
             .IsRequired()
@@ -28,6 +31,10 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
             .IsRequired()
             .HasColumnName("name")
             .HasMaxLength(30);
+        //shadow properties
+        builder.Property<bool>("IsDelete")
+            .HasColumnName("is_delete")
+            .HasDefaultValue(false);
         builder.Property<DateTime>("CreateAt")
             .HasColumnName("create_at")
             .ValueGeneratedOnAdd()

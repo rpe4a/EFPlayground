@@ -1,4 +1,5 @@
-﻿using EFDatabaseContext.Models.Company;
+﻿using System.Reflection;
+using EFDatabaseContext.Models.Company;
 using EFDatabaseContext.Models.User;
 using EFDatabaseContext.Models.UserProfile;
 using Microsoft.EntityFrameworkCore;
@@ -13,9 +14,9 @@ public sealed class PlaygroundContext : DbContext
 
     public PlaygroundContext(DbContextOptions options) : base(options)
     {
-        // Database.EnsureDeleted();
-        Database.Migrate();
-        // Database.EnsureCreated();
+        Database.EnsureDeleted();
+        // Database.Migrate();
+        Database.EnsureCreated();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -23,5 +24,8 @@ public sealed class PlaygroundContext : DbContext
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new UserProfileConfiguration());
+        
+        // or
+        // modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

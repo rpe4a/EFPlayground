@@ -12,18 +12,22 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         // Keys
         builder.HasKey(u => u.Id);
+        // one-to-many
         builder.HasOne(u => u.Company)
             .WithMany()
             .HasForeignKey(u => u.CompanyId)
             .OnDelete(DeleteBehavior.SetNull);
+        // one-to-one
         builder.HasOne(u => u.Profile)
             .WithOne(u => u.User)
-            .HasForeignKey<User>(u => u.ProfileId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Indexes
         builder.HasIndex(u => u.Login).IsUnique();
-
+        
+        //QueryFilter
+        builder.HasQueryFilter(u => !EF.Property<bool>(u.Company, "IsDelete"));
+        
         // Constraints
 
         // Properties
@@ -33,9 +37,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(p => p.CompanyId)
             .IsRequired()
             .HasColumnName("company_id");
-        builder.Property(p => p.ProfileId)
-            .IsRequired()
-            .HasColumnName("profile_id");
         builder.Property<string>(p => p.Login)
             .IsRequired()
             .HasColumnName("login")
@@ -44,6 +45,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasColumnName("password")
             .HasMaxLength(50);
+        //shadow properties
         builder.Property<DateTime>("CreateAt")
             .HasColumnName("create_at")
             .ValueGeneratedOnAdd()

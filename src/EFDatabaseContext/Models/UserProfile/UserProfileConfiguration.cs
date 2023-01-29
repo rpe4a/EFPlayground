@@ -14,7 +14,7 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.HasKey(u => u.Id);
         builder.HasOne(u => u.User)
             .WithOne(u => u.Profile)
-            .HasForeignKey<User.User>(u => u.ProfileId)
+            .HasForeignKey<UserProfile>(u => u.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Indexes
@@ -27,6 +27,9 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.Property(p => p.Id)
             .IsRequired()
             .HasColumnName("id");
+        builder.Property(p => p.UserId)
+            .IsRequired()
+            .HasColumnName("user_id");
         builder.Property<string>(p => p.Name!)
             .IsRequired()
             .HasColumnName("name")
@@ -35,6 +38,7 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
             .IsRequired()
             .HasColumnName("age")
             .HasMaxLength(3);
+        //shadow properties
         builder.Property<DateTime>("CreateAt")
             .HasColumnName("create_at")
             .ValueGeneratedOnAdd()

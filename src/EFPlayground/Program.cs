@@ -105,7 +105,7 @@ namespace EFPlayground
                 .UseSqlite(
                     configuration.GetConnectionString("DefaultConnection"),
                     o => o.MigrationsAssembly("EFDatabaseMigration"))
-                //.LogTo(Console.WriteLine)
+                .LogTo(Console.WriteLine)
                 .Options;
         }
 

@@ -10,7 +10,6 @@ public class User: Entity
     public string Password { get; set; }
     public Guid CompanyId { get; set; }
     public Company Company { get; set; }
-    public Guid ProfileId { get; set; }
     public UserProfile Profile { get; set; }
    
 }
