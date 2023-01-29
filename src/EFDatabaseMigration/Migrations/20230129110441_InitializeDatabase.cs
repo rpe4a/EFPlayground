@@ -18,31 +18,13 @@ namespace EFDatabaseMigration.Migrations
                     id = table.Column<Guid>(type: "TEXT", nullable: false),
                     name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
                     createat = table.Column<DateTime>(name: "create_at", type: "TEXT", nullable: false, defaultValueSql: "DATETIME('now')"),
+                    isdelete = table.Column<bool>(name: "is_delete", type: "INTEGER", nullable: false, defaultValue: false),
                     updateat = table.Column<DateTime>(name: "update_at", type: "TEXT", nullable: false, defaultValueSql: "DATETIME('now')"),
                     version = table.Column<long>(type: "INTEGER", rowVersion: true, nullable: false, defaultValue: 0L)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Company", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Profile",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    age = table.Column<int>(type: "INTEGER", maxLength: 3, nullable: false),
-                    passport = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    createat = table.Column<DateTime>(name: "create_at", type: "TEXT", nullable: false, defaultValueSql: "DATETIME('now')"),
-                    updateat = table.Column<DateTime>(name: "update_at", type: "TEXT", nullable: false, defaultValueSql: "DATETIME('now')"),
-                    version = table.Column<long>(type: "INTEGER", rowVersion: true, nullable: false, defaultValue: 0L)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Profile", x => x.id);
-                    table.CheckConstraint("Age", "Age > 0 AND Age < 150");
                 });
 
             migrationBuilder.CreateTable(
@@ -53,7 +35,6 @@ namespace EFDatabaseMigration.Migrations
                     login = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     password = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     companyid = table.Column<Guid>(name: "company_id", type: "TEXT", nullable: false),
-                    profileid = table.Column<Guid>(name: "profile_id", type: "TEXT", nullable: false),
                     createat = table.Column<DateTime>(name: "create_at", type: "TEXT", nullable: false, defaultValueSql: "DATETIME('now')"),
                     updateat = table.Column<DateTime>(name: "update_at", type: "TEXT", nullable: false, defaultValueSql: "DATETIME('now')"),
                     version = table.Column<long>(type: "INTEGER", rowVersion: true, nullable: false, defaultValue: 0L)
@@ -67,10 +48,30 @@ namespace EFDatabaseMigration.Migrations
                         principalTable: "Company",
                         principalColumn: "id",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Profile",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    age = table.Column<int>(type: "INTEGER", maxLength: 3, nullable: false),
+                    passport = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    userid = table.Column<Guid>(name: "user_id", type: "TEXT", nullable: false),
+                    createat = table.Column<DateTime>(name: "create_at", type: "TEXT", nullable: false, defaultValueSql: "DATETIME('now')"),
+                    updateat = table.Column<DateTime>(name: "update_at", type: "TEXT", nullable: false, defaultValueSql: "DATETIME('now')"),
+                    version = table.Column<long>(type: "INTEGER", rowVersion: true, nullable: false, defaultValue: 0L)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Profile", x => x.id);
+                    table.CheckConstraint("Age", "Age > 0 AND Age < 150");
                     table.ForeignKey(
-                        name: "FK_User_Profile_profile_id",
-                        column: x => x.profileid,
-                        principalTable: "Profile",
+                        name: "FK_Profile_User_user_id",
+                        column: x => x.userid,
+                        principalTable: "User",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -98,6 +99,12 @@ namespace EFDatabaseMigration.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Profile_user_id",
+                table: "Profile",
+                column: "user_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_User_company_id",
                 table: "User",
                 column: "company_id");
@@ -107,13 +114,6 @@ namespace EFDatabaseMigration.Migrations
                 table: "User",
                 column: "login",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_profile_id",
-                table: "User",
-                column: "profile_id",
-                unique: true);
-            
             migrationBuilder.Sql(@"CREATE TRIGGER UpdateUserVersion
 AFTER UPDATE ON User
 BEGIN
@@ -150,13 +150,13 @@ END;");
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Profile");
+
+            migrationBuilder.DropTable(
                 name: "User");
 
             migrationBuilder.DropTable(
                 name: "Company");
-
-            migrationBuilder.DropTable(
-                name: "Profile");
         }
     }
 }

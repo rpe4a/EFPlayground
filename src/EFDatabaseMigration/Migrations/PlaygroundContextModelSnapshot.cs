@@ -30,6 +30,12 @@ namespace EFDatabaseMigration.Migrations
                         .HasColumnName("create_at")
                         .HasDefaultValueSql("DATETIME('now')");
 
+                    b.Property<bool>("IsDelete")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_delete");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -85,10 +91,6 @@ namespace EFDatabaseMigration.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("password");
 
-                    b.Property<Guid>("ProfileId")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("profile_id");
-
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
@@ -107,9 +109,6 @@ namespace EFDatabaseMigration.Migrations
                     b.HasIndex("CompanyId");
 
                     b.HasIndex("Login")
-                        .IsUnique();
-
-                    b.HasIndex("ProfileId")
                         .IsUnique();
 
                     b.ToTable("User", (string)null);
@@ -145,6 +144,10 @@ namespace EFDatabaseMigration.Migrations
                         .HasColumnName("update_at")
                         .HasDefaultValueSql("DATETIME('now')");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("user_id");
+
                     b.Property<long>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
@@ -155,6 +158,9 @@ namespace EFDatabaseMigration.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Profile", null, t =>
                         {
@@ -170,19 +176,17 @@ namespace EFDatabaseMigration.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
-                    b.HasOne("EFDatabaseContext.Models.UserProfile.UserProfile", "Profile")
-                        .WithOne("User")
-                        .HasForeignKey("EFDatabaseContext.Models.User.User", "ProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Company");
-
-                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("EFDatabaseContext.Models.UserProfile.UserProfile", b =>
                 {
+                    b.HasOne("EFDatabaseContext.Models.User.User", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("EFDatabaseContext.Models.UserProfile.UserProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsOne("EFDatabaseContext.Models.UserProfile.OfficialData", "OfficialData", b1 =>
                         {
                             b1.Property<Guid>("UserProfileId")
@@ -216,6 +220,8 @@ namespace EFDatabaseMigration.Migrations
 
                     b.Navigation("OfficialData")
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EFDatabaseContext.Models.Company.Company", b =>
@@ -223,9 +229,9 @@ namespace EFDatabaseMigration.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("EFDatabaseContext.Models.UserProfile.UserProfile", b =>
+            modelBuilder.Entity("EFDatabaseContext.Models.User.User", b =>
                 {
-                    b.Navigation("User")
+                    b.Navigation("Profile")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618
